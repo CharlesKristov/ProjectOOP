@@ -1,11 +1,17 @@
 import java.util.*;
 
+import javax.swing.text.View;
+
 public class Main {
 
 	Scanner sc = new Scanner(System.in);
-	Vector<Parts> parts = new Vector<Parts>();
-	Vector<Customer> customers = new Vector<Customer>();
-	Vector<TransactionHistory> transHistory = new Vector<TransactionHistory>();
+	Random rand = new Random();
+    Vector<Parts> parts = new Vector<Parts>();
+    Vector<Customer> customers = new Vector<Customer>();
+    Vector<TransactionHistory> transHistory = new Vector<TransactionHistory>();
+    Vector<Air> airs = new Vector<Air>();
+    Vector<Sea> seas = new Vector<Sea>();
+    Vector<Land> lands = new Vector<Land>();
 	//method untuk validasi input yang dimasukkan harus integer (string akan error) 
 	public void clearScreen()
 	{
@@ -37,15 +43,14 @@ public class Main {
 		}
 		return input;	
 	}
+	
 	public void addTransHistory(String TransType, int qty, String partID, String custID, String supplierName, int totalPrice, String paymentMethod)
-	{
-		String id = "TR";
-		TransType.toUpperCase();
-		if (transHistory.size() > 0 && transHistory.size() < 10) id += "00" + transHistory.size();
-		else if (transHistory.size() > 9 && transHistory.size() < 100) id += "0" + transHistory.size();
-		else if (transHistory.size() > 99 && transHistory.size() < 1000)  id += transHistory.size();
-		transHistory.add(new TransactionHistory(id, TransType, qty, partID, custID, supplierName, totalPrice, paymentMethod));
-	}
+    {
+        String id = "TR" + String.format("%03d", transHistory.size()+1);
+        TransType.toUpperCase();
+        transHistory.add(new TransactionHistory(id, TransType, qty, partID, custID, supplierName, totalPrice, paymentMethod));
+    }
+	
 	public void printHeader(String headerMenu)
 	{
 		if (headerMenu.length() > 0)
@@ -56,18 +61,20 @@ public class Main {
 		else System.out.println("Group 22 Sparepart");
 		System.out.println("=========================");
 	}
+	
 	public void printMenu()
 	{
-		clearScreen();
-		printHeader("");
-		System.out.println("1. Buy Parts");
-		System.out.println("2. Sell Parts");
-		System.out.println("3. View Member");
-		System.out.println("4. View Available Parts");
-		System.out.println("5. View Transaction History");
-		System.out.println("6. View Shipping Method");
-		System.out.println("7. Exit");
+	    clearScreen();
+	    printHeader("");
+	    System.out.println("1. Buy Parts");
+	    System.out.println("2. Sell Parts");
+	    System.out.println("3. View Member");
+	    System.out.println("4. View Available Parts");
+	    System.out.println("5. View Transaction History");
+	    System.out.println("6. View Shipping List");
+	    System.out.println("7. Exit");
 	}
+	
 	public void viewAvailableParts()
 	{
 		printHeader("View Available Parts");
@@ -175,6 +182,208 @@ public class Main {
 		
 	}
 	
+	public void AddMember() {
+		String custName = null;
+		String custStatus = null;
+		String custID = null;
+		double diskon= 1;
+		do {
+			System.out.println("Input Customer Name: ");
+			custName = sc.nextLine();
+		} while (custName.length()<5);
+		
+		do {
+			System.out.println("Input Customer Status [none|premium|gold]: ");
+			custStatus = sc.nextLine();
+		} while (!custStatus.equals("none") && !custStatus.equals("premium") && !custStatus.equals("gold"));
+		
+		 
+		
+		custID = "CU" + String.format("%03d", rand.nextInt(1000));
+		System.out.println("Member successfully added!");
+		
+		sc.nextLine();
+		
+		customers.add(new Customer(custID, custName, custStatus, diskon));
+	}
+	
+	public boolean CheckSearchID(String search) {
+			
+			if(search.length()!=5)
+			{
+				return false;
+			}
+			
+			if(search.charAt(0)!='C')
+			{
+				return false;
+			}
+			if(search.charAt(1)!= 'U')
+			{
+				return false;
+			}
+			
+			for (int i = 2; i < 5; i++) {
+				char temp = search.charAt(i);
+				if(Character.isDigit(temp)==false)
+				{
+					return false;
+				}
+			}
+			
+			return true;
+		}
+	
+	public void DeleteMember(Vector <Customer> customers) {
+		String deleteID = null;
+		System.out.println("Input ID you want to delete: ");
+		deleteID = sc.nextLine();
+		
+		if(CheckSearchID(deleteID)==false)
+		{
+			System.out.println("Invalid");
+			System.out.println("Press Enter to continue...");
+			sc.nextLine();
+			return;
+		}
+		
+		for (int i = 0; i < customers.size(); i++) {
+			if(customers.get(i).getCustID().equals(deleteID))
+			{
+				customers.remove(i);
+				System.out.println("Success remove Member");
+				sc.nextLine();
+				return;
+			}
+		}
+		
+		System.out.println("Press Enter to Continue...");
+		sc.nextLine();
+		return;
+	}
+	
+	public void UpdateMember(Vector<Customer> customers) {
+		String updateID = null;
+		String custName = null;
+		String custStatus = null;
+		
+		System.out.println("Input ID you want to update: ");
+		updateID = sc.nextLine();
+		
+		if(CheckSearchID(updateID)==false)
+		{
+			System.out.println("Invalid");
+			System.out.println("Press Enter to continue...");
+			sc.nextLine();
+			return;
+		}
+		
+		Customer tempCust = null;
+		
+		for (Customer customer : customers) {
+			if(customer.getCustID().equals(updateID))
+			{
+				tempCust = customer;
+				break;
+			}
+		}
+		
+		if(tempCust == null)
+		{
+			System.out.println("Not Found!");
+			System.out.println("Press Enter to continue...");
+			sc.nextLine();
+			return;
+		}
+		
+		do {
+			System.out.println("Input New Name: ");
+			System.out.print(">>");
+			try {
+				custName = sc.nextLine();
+			} catch (Exception e) {
+				sc.nextLine();
+			}
+		} while (custName.length()<5);
+		
+		do {
+			System.out.println("Input New Status [none|premium|gold]: ");
+			System.out.print(">>");
+			try {
+				custStatus = sc.nextLine();
+			} catch (Exception e) {
+				sc.nextLine();
+			}
+		} while (!custStatus.equals("none") && !custStatus.equals("premium") && !custStatus.equals("gold"));
+		
+		tempCust.setCustName(custName);
+		tempCust.setCustStatus(custStatus);
+		System.out.printf("Successfully updated with ID %s!\n", tempCust.getCustID());
+		System.out.println("Press Enter to continue...");
+		sc.nextLine();
+	}
+	
+	public void MemberMenu() {
+	    System.out.println("1. Add Member");
+	    System.out.println("2. Update Member");
+	    System.out.println("3. Remove Member");
+	    System.out.println("4. Return to Main Menu");
+	}
+	
+	public void ViewMember() {
+		clearScreen();
+		printHeader("");
+		if(customers.isEmpty())
+		{
+			System.out.println("No Member Found!");
+		}
+		else
+		{
+			System.out.println("=======================================================");
+			System.out.printf("| %-10s | %-20s | %-10s |\n", "CustomerID", "Customer Name", "Customer Status");
+			System.out.println("=======================================================");
+			for (Customer customer : customers) {
+				System.out.printf("| %-10s | %-20s | %-15s |\n", customer.getCustID(), customer.getCustName(), customer.getCustStatus());
+			}
+			System.out.println("=======================================================");
+		}
+		
+		
+		int opt=-1;
+		do {
+			MemberMenu();
+			try {
+				opt = sc.nextInt();
+				sc.nextLine();
+			} catch (Exception e) {
+				// TODO: handle exception
+				sc.nextLine();
+			}
+			
+			if(opt==1)
+			{
+				AddMember();
+				ViewMember();
+			}
+			else if(opt==2)
+			{
+				UpdateMember(customers);
+				ViewMember();
+			}
+			else if(opt == 3)
+			{
+				DeleteMember(customers);
+				ViewMember();
+			}
+			else if(opt == 4)
+			{
+				return;
+			}
+			
+		} while (opt != 4);
+		return;
+	}
+	
 	public Main() {
 		// TODO Auto-generated constructor stub
 		int choice = 0;
@@ -183,20 +392,44 @@ public class Main {
 			printMenu();
 			choice = validateIntInput(choice, 1);
 			if (choice == 1)
-			else if (choice == 2) sellParts();
+			{
+				
+			}
+			else if (choice == 2)
+			{
+				sellParts();
+			}
 			else if (choice == 3)
-			else if (choice == 4) viewAvailableParts();
+			{
+				ViewMember();
+			}
+			else if (choice == 4) 
+			{
+				viewAvailableParts();
+			}
 			else if (choice == 5)
+			{
+				
+			}
 			else if (choice == 6)
-			else if (choice == 7) break;
-			else System.out.println("Wrong input range!");
+			{
+				
+			}
+			else if (choice == 7)
+			{
+				break;
+			}
+			else 
+			{
+				System.out.println("Wrong input range!");
+			}
 		}
 		
 	}
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
+		new Main();
 	}
 
 }
