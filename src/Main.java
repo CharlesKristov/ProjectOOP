@@ -446,7 +446,32 @@ public class Main {
         sc.nextLine();
     }
 	
-	
+	public void viewShippingList() {
+        printHeader("Shipping List");
+        if(lands.isEmpty() && seas.isEmpty() && airs.isEmpty()) {
+            System.out.println("No Shipping Data");
+            System.out.println("================");
+            System.out.println("Press Enter To Continue...");
+        }else {
+            System.out.println("===============================================================");
+            System.out.printf("| %-10s | %-15s | %-15s | %-10s |\n","Ship ID","Shipping Name", "Shipping Method","Cost");
+            System.out.println("===============================================================");
+            for(Land l : lands) {
+                System.out.printf("| %-10s | %-15s | %-15s | %-10s |\n",l.getShipID(),l.getShippingName(),l.getShippingMethodName(),l.getShippingCost());
+            }
+            
+            for(Sea s : seas) {
+                System.out.printf("| %-10s | %-15s | %-15s | %-10s |\n",s.getShipID(),s.getShippingName(),s.getShippingMethodName(),s.getShippingCost());
+            }
+            
+            for(Air a : airs) {
+                System.out.printf("| %-10s | %-15s | %-15s | %-10s |\n",a.getShipID(),a.getShippingName(),a.getShippingMethodName(),a.getShippingCost());
+            }
+            System.out.println("===============================================================");
+            System.out.println("Press Enter To Continue...");
+        }
+        sc.nextLine();
+    }
 	
 	public Main() {
 		// TODO Auto-generated constructor stub
