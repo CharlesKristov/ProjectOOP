@@ -4,8 +4,8 @@ public class TransactionHistory {
 	private String transID;
 	private String transType;
 	private int transQty;
-	private String partID;
 	private String custID;
+	private String partID;
 	private String supplierName;
 	private int transPrice;
 	private String paymentMethod;
