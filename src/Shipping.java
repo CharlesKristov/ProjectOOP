@@ -30,41 +30,41 @@ public class Shipping {
 	}
 }
 class Land extends Shipping {
-    private int shippingCost;
-    public Land(String shipID, String shippingName, String shippingMethodName, int shippingCost) {
-        super(shipID, shippingName, shippingMethodName);
-        this.setShippingCost(20000);
-    }
-    public int getShippingCost() {
-        return shippingCost;
-    }
-    public void setShippingCost(int shippingCost) {
-        this.shippingCost = shippingCost;
-    }
+	private int shippingCost;
+	public Land(String shipID, String shippingName, String shippingMethodName) {
+		super(shipID, shippingName, shippingMethodName);
+		this.setShippingCost(20000);
+	}
+	public int getShippingCost() {
+		return shippingCost;
+	}
+	public void setShippingCost(int shippingCost) {
+		this.shippingCost = shippingCost;
+	}
 }
 class Sea extends Shipping {
-    private int shippingCost;
-    public Sea(String shipID, String shippingName, String shippingMethodName, int shippingCost) {
-        super(shipID, shippingName, shippingMethodName);
-        this.setShippingCost(50000);
-    }
-    public int getShippingCost() {
-        return shippingCost;
-    }
-    public void setShippingCost(int shippingCost) {
-        this.shippingCost = shippingCost;
-    }
+	private int shippingCost;
+	public Sea(String shipID, String shippingName, String shippingMethodName) {
+		super(shipID, shippingName, shippingMethodName);
+		this.setShippingCost(50000);
+	}
+	public int getShippingCost() {
+		return shippingCost;
+	}
+	public void setShippingCost(int shippingCost) {
+		this.shippingCost = shippingCost;
+	}
 }
 class Air extends Shipping {
-    private int shippingCost;
-    public Air(String shipID, String shippingName, String shippingMethodName, int shippingCost) {
-        super(shipID, shippingName, shippingMethodName);
-        this.setShippingCost(100000);
-    }
-    public int getShippingCost() {
-        return shippingCost;
-    }
-    public void setShippingCost(int shippingCost) {
-        this.shippingCost = shippingCost;
-    }
+	private int shippingCost;
+	public Air(String shipID, String shippingName, String shippingMethodName) {
+		super(shipID, shippingName, shippingMethodName);
+		this.setShippingCost(100000);
+	}
+	public int getShippingCost() {
+		return shippingCost;
+	}
+	public void setShippingCost(int shippingCost) {
+		this.shippingCost = shippingCost;
+	}
 }
