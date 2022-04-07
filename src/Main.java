@@ -76,23 +76,23 @@ public class Main {
 	}
 	
 	public void viewAvailableParts()
-	{
-		printHeader("View Available Parts");
-		if (parts.size() > 0) 
-		{
-			for (int i=0; i<parts.size(); i++)
-			{
-				System.out.printf("%d.\n", i+1);
-				System.out.println("PartID: " + parts.get(i).getPartID());
-				System.out.println("Part Name: " + parts.get(i).getPartName());
-				System.out.println("Part Stock: " + parts.get(i).getPartQty());
-				System.out.println("Part Price (each): Rp " + parts.get(i).getPartPrice());
-			}
-			System.out.println("===================================================");
-		}
-		else System.out.print("There is no part in database"); 
-		sc.nextLine();
-	}
+    {
+        printHeader("View Available Parts");
+        if (parts.size() > 0) 
+        {
+            for (int i=0; i<parts.size(); i++)
+            {
+                System.out.printf("%d.\n", i+1);
+                System.out.println("PartID: " + parts.get(i).getPartID());
+                System.out.println("Part Name: " + parts.get(i).getPartName());
+                System.out.println("Part Stock: " + parts.get(i).getPartQty());
+                System.out.println("Part Price (each): Rp " + parts.get(i).getPartPrice());
+            }
+            System.out.println("===================================================");
+        }
+        else System.out.print("There is no part in database"); 
+        sc.nextLine();
+    }
 	
 	public void sellParts()
 	{
@@ -369,7 +369,7 @@ public class Main {
 	
 	public void ViewMember() {
 		clearScreen();
-		printHeader("");
+		printHeader("View Member");
 		if(customers.isEmpty())
 		{
 			System.out.println("No Member Found!");
@@ -420,6 +420,33 @@ public class Main {
 		} while (opt != 4);
 		return;
 	}
+	
+	public void viewTransactionHistory() {
+        printHeader("View Transaction History");
+        if(transHistory.isEmpty()) {
+            System.out.println("No Data Transaction ");
+            System.out.println("Press Enter To Continue...");
+        
+        }else {
+            System.out.println("============================================================================================================================================");
+            System.out.printf("| %-15s | %-10s | %-15s | %-15s | %-20s | %-15s | %-15s | %-10s |\n","Transaction ID","Type", "Quantity","Customer ID","Part ID","Supplier Name","Payment Method","Price");
+            System.out.println("============================================================================================================================================");
+            
+            for(TransactionHistory th : transHistory) {
+                if(th.getTransType().equalsIgnoreCase("Buy")) {
+                    System.out.printf("| %-15s | %-10s | %-15s | %-15s | %-20s | %-15s | %-15s | %-10s |\n",th.getTransID(),th.getTransType(),th.getTransQty(),th.getCustID(),th.getPartID(),th.getSupplierName(),th.getPaymentMethod(),th.getTransPrice());                    
+                }else if(th.getTransType().equalsIgnoreCase("Sell")) {
+                    System.out.printf("| %-15s | %-10s | %-15s | %-15s | %-20s | %-15s | %-15s | %-10s |\n",th.getTransID(),th.getTransType(),th.getTransQty(),th.getCustID(),th.getPartID()," ",th.getPaymentMethod(),th.getTransPrice());                    
+                }
+            }        
+            System.out.println("============================================================================================================================================");
+            System.out.println("Press Enter To Continue...");
+        }
+        
+        sc.nextLine();
+    }
+	
+	
 	
 	public Main() {
 		// TODO Auto-generated constructor stub
