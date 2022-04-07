@@ -96,90 +96,127 @@ public class Main {
 	
 	public void sellParts()
 	{
-		String id, custID = null, memberSelect, paymentMethod;
+		String id, custID = null, shipID = "SH" + String.format("%03d", transHistory.size()+1), memberSelect, paymentMethod, shipping, shipperName;
 		int qty = 0, totalPrice = 0, index = 0;
 		clearScreen();
 		printHeader("Sell Parts");
 		viewAvailableParts();
-		//validate inputed id is valid
-		while(true)
+		if (parts.size() > 0)
 		{
-			id = sc.nextLine();
-			int valid=0;
-			for(int i=0 ;i<parts.size(); i++)
+			//validate inputed id is valid
+			while(true)
 			{
-				if (id.compareTo(parts.get(i).getPartID()) == 0)
+				System.out.print("Input PartID to Sell: ");
+				id = sc.nextLine();
+				int valid=0;
+				for(int i=0 ;i<parts.size(); i++)
 				{
-					index = i;
-					valid = 1;
+					if (id.compareTo(parts.get(i).getPartID()) == 0)
+					{
+						index = i;
+						valid = 1;
+						break;
+					}
+				}
+				if (valid == 1) break;
+			}
+			//validate qty nya ada dan qty tidak lebih dari jumlah stock
+			while(true)
+			{
+				qty = validateIntInput(qty, 4);
+				//langsung kurangin stock 
+				if (qty > 0 && qty <= parts.get(index).getPartQty()) 
+				{
+					parts.get(index).setPartQty(qty-parts.get(index).getPartQty());
 					break;
 				}
 			}
-			if (valid == 1) break;
-		}
-		//validate qty nya ada dan qty tidak lebih dari jumlah stock
-		while(true)
-		{
-			qty = validateIntInput(qty, 4);
-			//langsung kurangin stock 
-			if (qty > 0 && qty <= parts.get(index).getPartQty()) 
+			//melakukan perhitungan total transaksi
+			totalPrice = qty*parts.get(index).getPartPrice();
+			//mengecek member status dan mengaplikasikan diskon sesuai member yang berlaku
+			while(true)
 			{
-				parts.get(index).setPartQty(qty-parts.get(index).getPartQty());
-				break;
-			}
-		}
-		//melakukan perhitungan total transaksi
-		totalPrice = qty*parts.get(index).getPartPrice();
-		//mengecek member status dan mengaplikasikan diskon sesuai member yang berlaku
-		while(true)
-		{
-			System.out.println("Do you have any membership? [Yes or No]");
-			memberSelect = sc.nextLine();
-			if (memberSelect.equalsIgnoreCase("Yes"))
-			{
-				
-				System.out.print("Please input your member ID: ");
-				custID = sc.nextLine();
-				for (int i=0; i<customers.size(); i++)
+				System.out.println("Do you have any membership? [Yes or No]");
+				memberSelect = sc.nextLine();
+				if (memberSelect.equalsIgnoreCase("Yes"))
 				{
-					if (custID.compareTo(customers.get(i).getCustID()) == 0)
+					
+					System.out.print("Please input your member ID: ");
+					custID = sc.nextLine();
+					for (int i=0; i<customers.size(); i++)
 					{
-						if (customers.get(i).getCustStatus().equalsIgnoreCase("Premium"))
+						if (custID.compareTo(customers.get(i).getCustID()) == 0)
 						{
-							premiumCust premium = new premiumCust();
-							totalPrice = (int) (totalPrice - (totalPrice*premium.diskon()));
-							System.out.println("Yay, here is your 10% discount for your premium membership");
-						}
-						else if (customers.get(i).getCustStatus().equalsIgnoreCase("Gold"))
-						{
-							goldCust gold = new goldCust();
-							totalPrice = (int) (totalPrice - (totalPrice*gold.diskon()));
-							System.out.println("Yay, here is your 5% discount for your gold membership");
+							if (customers.get(i).getCustStatus().equalsIgnoreCase("Premium"))
+							{
+								premiumCust premium = new premiumCust();
+								totalPrice = (int) (totalPrice - (totalPrice*premium.diskon()));
+								System.out.println("Yay, here is your 10% discount for your premium membership");
+							}
+							else if (customers.get(i).getCustStatus().equalsIgnoreCase("Gold"))
+							{
+								goldCust gold = new goldCust();
+								totalPrice = (int) (totalPrice - (totalPrice*gold.diskon()));
+								System.out.println("Yay, here is your 5% discount for your gold membership");
+							}
 						}
 					}
+					break;
 				}
-				break;
+				else if (memberSelect.equalsIgnoreCase("No")) break;
+				else System.out.println("Choose Yes or No only!");
 			}
-			else if (memberSelect.equalsIgnoreCase("No")) break;
-			else System.out.println("Choose Yes or No only!");
-		}
-		//validate payment method
-		while(true)
-		{
-			System.out.print("Choose Your Payment Method [M-Banking | Cash | Credit Card]: ");
-			paymentMethod = sc.nextLine();
-			if (paymentMethod.equalsIgnoreCase("M-Banking") || paymentMethod.equalsIgnoreCase("Cash") || paymentMethod.equalsIgnoreCase("Credit Card"))
+			//validate payment method
+			while(true)
 			{
-				break;
+				System.out.print("Choose Your Payment Method [M-Banking | Cash | Credit Card]: ");
+				paymentMethod = sc.nextLine();
+				if (paymentMethod.equals("M-Banking") || paymentMethod.equals("Cash") || paymentMethod.equals("Credit Card"))
+				{
+					break;
+				}
 			}
+			//validate shipping
+			while(true)
+			{
+				System.out.print("Choose Your Shipping Method [ Air | Land | Sea ]: ");
+				shipping = sc.nextLine();
+				if (shipping.equals("Air") || shipping.equals("Land") || shipping.equals("Sea"))
+				{
+					while(true)
+					{
+						System.out.print("Input Your Shipper's Name [cannot be empty]: ");
+						shipperName = sc.nextLine();
+						if (shipperName.length() > 0) break;
+					}
+					if (shipping.equals("Air"))
+					{
+						totalPrice += airs.get(index).getShippingCost();
+						airs.add(new Air(shipID, shipping, shipperName, airs.get(index).getShippingCost()));
+						System.out.println("Added Air Shipping Cost to Total Price!");
+					}
+					else if (shipping.equals("Land"))
+					{
+						totalPrice += airs.get(index).getShippingCost();
+						lands.add(new Land(shipID, shipping, shipperName, airs.get(index).getShippingCost()));
+						System.out.println("Added Land Shipping Cost to Total Price!");
+					}
+					else if (shipping.equals("Sea"))
+					{
+						totalPrice += seas.get(index).getShippingCost();
+						seas.add(new Sea(shipID, shipping, shipperName, airs.get(index).getShippingCost()));
+						System.out.println("Added Sea Shipping Cost to Total Price!");
+					}
+					break;
+				}
+			}
+			if (parts.get(index).getPartQty() <= 0) parts.remove(index);
+			//tambahkan ke history transaksi
+			addTransHistory("SELL", qty, id, custID, "", totalPrice, paymentMethod);
+			System.out.println("Total Price for your transaction: " + totalPrice);
+			System.out.print("Your transaction has been done successfully!"); sc.nextLine();
+			
 		}
-		if (parts.get(index).getPartQty() <= 0) parts.remove(index);
-		//tambahkan ke history transaksi
-		addTransHistory("SELL", qty, id, custID, "", totalPrice, paymentMethod);
-		System.out.println("Total Price for your transaction: " + totalPrice);
-		System.out.print("Your transaction has been done successfully!"); sc.nextLine();
-		
-		
 	}
 	
 	public void AddMember() {
