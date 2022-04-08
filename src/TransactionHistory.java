@@ -11,6 +11,20 @@ public class TransactionHistory {
 	private int transPrice;
 	private String paymentMethod;
 	
+	public TransactionHistory(String transID, String transType, int transQty, String partID, String custID,
+			String supplierName, int transPrice, String paymentMethod, String shipID) {
+		super();
+		this.transID = transID;
+		this.transType = transType;
+		this.transQty = transQty;
+		this.partID = partID;
+		this.custID = custID;
+		this.supplierName = supplierName;
+		this.transPrice = transPrice;
+		this.paymentMethod = paymentMethod;
+		this.shipID = shipID;
+	}
+	
 	public String getShipID() {
 		return shipID;
 	}
@@ -65,19 +79,7 @@ public class TransactionHistory {
 	public void setPaymentMethod(String paymentMethod) {
 		this.paymentMethod = paymentMethod;
 	}
-	public TransactionHistory(String transID, String transType, int transQty, String partID, String custID,
-			String supplierName, int transPrice, String paymentMethod, String shipID) {
-		super();
-		this.transID = transID;
-		this.transType = transType;
-		this.transQty = transQty;
-		this.partID = partID;
-		this.custID = custID;
-		this.supplierName = supplierName;
-		this.transPrice = transPrice;
-		this.paymentMethod = paymentMethod;
-		this.shipID = shipID;
-	}
+	
 	
 	
 
