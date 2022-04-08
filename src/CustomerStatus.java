@@ -16,9 +16,3 @@ class goldCust extends CustomerStatus {
 		return 0.05;
 	}
 }
-class none extends CustomerStatus {
-	public double diskon()
-	{
-		return 1;
-	}
-}

@@ -6,9 +6,17 @@ public class TransactionHistory {
 	private int transQty;
 	private String custID;
 	private String partID;
+	private String shipID;
 	private String supplierName;
 	private int transPrice;
 	private String paymentMethod;
+	
+	public String getShipID() {
+		return shipID;
+	}
+	public void setShipID(String shipID) {
+		this.shipID = shipID;
+	}
 	public String getTransID() {
 		return transID;
 	}
@@ -58,7 +66,7 @@ public class TransactionHistory {
 		this.paymentMethod = paymentMethod;
 	}
 	public TransactionHistory(String transID, String transType, int transQty, String partID, String custID,
-			String supplierName, int transPrice, String paymentMethod) {
+			String supplierName, int transPrice, String paymentMethod, String shipID) {
 		super();
 		this.transID = transID;
 		this.transType = transType;
@@ -68,6 +76,7 @@ public class TransactionHistory {
 		this.supplierName = supplierName;
 		this.transPrice = transPrice;
 		this.paymentMethod = paymentMethod;
+		this.shipID = shipID;
 	}
 	
 	

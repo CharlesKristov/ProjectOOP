@@ -9,6 +9,7 @@ public class Main {
 	Vector<Air> airs = new Vector<Air>();
 	Vector<Sea> seas = new Vector<Sea>();
 	Vector<Land> lands = new Vector<Land>();
+	Vector<Shipping> ships = new Vector<Shipping>();
 	//method untuk validasi input yang dimasukkan harus integer (string akan error)
 	public void clearScreen()
 	{
@@ -43,11 +44,11 @@ public class Main {
 		}
 		return input;	
 	}
-	public void addTransHistory(String TransType, int qty, String partID, String custID, String supplierName, int totalPrice, String paymentMethod)
+	public void addTransHistory(String TransType, int qty, String partID, String custID, String supplierName, int totalPrice, String paymentMethod, String shipID)
 	{
 		String id = "TR" + String.format("%03d", transHistory.size()+1);
 		TransType.toUpperCase();
-		transHistory.add(new TransactionHistory(id, TransType, qty, partID, custID, supplierName, totalPrice, paymentMethod));
+		transHistory.add(new TransactionHistory(id, TransType, qty, partID, custID, supplierName, totalPrice, paymentMethod, shipID));
 	}
 	public void printHeader(String headerMenu)
 	{
@@ -110,11 +111,12 @@ public class Main {
 				System.out.println("Part Price (each): Rp " + parts.get(i).getPartPrice());
 			}
 			System.out.println("===================================================");
+			System.out.println("Press Enter to Continue...");
 		}
 		else System.out.print("There is no part in database"); 
 		sc.nextLine();
 	}
-	public void AddMember() {
+	public String AddMember() {
 		String custName = null;
 		String custStatus = null;
 		String custID = null;
@@ -125,17 +127,18 @@ public class Main {
 		} while (custName.length()<5);
 		
 		do {
-			System.out.print("Input Customer Status [ none | premium | gold ]: ");
+			System.out.print("Input Customer Status [ premium | gold ]: ");
 			custStatus = sc.nextLine();
-		} while (!custStatus.equals("none") && !custStatus.equals("premium") && !custStatus.equals("gold"));
+		} while (!custStatus.equals("premium") && !custStatus.equals("gold"));
 		
 		 
 		
 		custID = "CU" + String.format("%03d", (int) Math.floor(Math.random()*1000));
-		System.out.print("Member successfully added!");
+		System.out.print("Member successfully added with ID:"+custID+"!");
 		sc.nextLine();
 		
 		customers.add(new Customer(custID, custName, custStatus, diskon));
+		return custID;
 	}
 	
 	public boolean CheckSearchID(String search) {
@@ -238,13 +241,13 @@ public class Main {
 		} while (custName.length()<5);
 		
 		do {
-			System.out.print("Input New Status [ none | premium | gold ]: ");
+			System.out.print("Input New Status [ premium | gold ]: ");
 			try {
 				custStatus = sc.nextLine();
 			} catch (Exception e) {
 				sc.nextLine();
 			}
-		} while (!custStatus.equals("none") && !custStatus.equals("premium") && !custStatus.equals("gold"));
+		} while (!custStatus.equals("premium") && !custStatus.equals("gold"));
 		
 		tempCust.setCustName(custName);
 		tempCust.setCustStatus(custStatus);
@@ -381,17 +384,18 @@ public class Main {
 		System.out.print("Successfully purchased " + qty + " " + name + " from " + supplier + " with total cost: Rp " + totalPrice + "!"); sc.nextLine();
 		price = (int) (price + (price*0.8));
 		parts.add(new Parts(partID, name, price, qty, supplier));
-		addTransHistory("BUY", qty, partID, "", supplier, totalPrice, paymentMethod);
+		addTransHistory("BUY", qty, partID, "", supplier, totalPrice, paymentMethod, "");
 	}
 	
 	
 	public void sellParts()
 	{
-		String id, custID = null, shipID = "SH" + String.format("%03d", transHistory.size()+1), memberSelect, paymentMethod, shipping, shipperName;
+		String id, custID = null, shipID = "SH" + String.format("%03d", (int) Math.floor(Math.random()*1000)), memberSelect, paymentMethod, shipping, shipperName;
 		int qty = 0, totalPrice = 0, index = 0;
 		clearScreen();
 		printHeader("Sell Parts");
 		viewAvailableParts();
+		
 		if (parts.size() > 0)
 		{
 			//validate inputed id is valid
@@ -432,8 +436,30 @@ public class Main {
 				if (memberSelect.equalsIgnoreCase("Yes"))
 				{
 					
-					System.out.print("Please input your member ID: ");
-					custID = sc.nextLine();
+					do {
+						System.out.print("Please input your Customer ID [CUXXX]: ");
+						custID = sc.nextLine();
+					} while (!CheckSearchID(custID));
+					
+					Customer tempCust = null;
+					
+					for (Customer customer : customers) {
+						if(customer.getCustID().equals(custID))
+						{
+							tempCust = customer;
+							break;
+						}
+					}
+					
+					if(tempCust == null)
+					{
+						System.out.println("Not Found!");
+						System.out.print("Press Enter to add new member...");
+						sc.nextLine();
+						custID = AddMember();
+					}
+					
+					
 					for (int i=0; i<customers.size(); i++)
 					{
 						if (custID.compareTo(customers.get(i).getCustID()) == 0)
@@ -454,7 +480,11 @@ public class Main {
 					}
 					break;
 				}
-				else if (memberSelect.equalsIgnoreCase("No")) break;
+				else if (memberSelect.equalsIgnoreCase("No")) 
+						{
+							custID = "CU"+String.format("%03d", (int) Math.floor(Math.random()*1000));
+							break;
+						}
 				else System.out.println("Choose Yes or No only!");
 			}
 			//validate payment method
@@ -482,19 +512,19 @@ public class Main {
 					}
 					if (shipping.equals("Air"))
 					{
-						airs.add(new Air(shipID, shipping, shipperName));
+						airs.add(new Air(shipID, shipperName, shipping));
 						totalPrice += airs.get(airs.size()-1).getShippingCost();
 						System.out.println("Added Air Shipping Cost to Total Price!");
 					}
 					else if (shipping.equals("Land"))
 					{
-						lands.add(new Land(shipID, shipping, shipperName));
+						lands.add(new Land(shipID, shipperName, shipping));
 						totalPrice += lands.get(lands.size()-1).getShippingCost();
 						System.out.println("Added Land Shipping Cost to Total Price!");
 					}
 					else if (shipping.equals("Sea"))
 					{
-						seas.add(new Sea(shipID, shipping, shipperName));
+						seas.add(new Sea(shipID, shipperName, shipping));
 						totalPrice += seas.get(seas.size()-1).getShippingCost();
 						System.out.println("Added Sea Shipping Cost to Total Price!");
 					}
@@ -503,12 +533,14 @@ public class Main {
 			}
 			if (parts.get(index).getPartQty() <= 0) parts.remove(index);
 			//tambahkan ke history transaksi
-			addTransHistory("SELL", qty, id, custID, "", totalPrice, paymentMethod);
+			addTransHistory("SELL", qty, id, custID, "", totalPrice, paymentMethod, shipID);
 			System.out.println("Total Price for your transaction: " + totalPrice);
 			System.out.print("Your transaction has been done successfully!"); sc.nextLine();
 			
 		}
 	}
+	
+	
 	public void viewShippingList() {
         printHeader("Shipping List");
         if(lands.isEmpty() && seas.isEmpty() && airs.isEmpty()) {
@@ -516,21 +548,55 @@ public class Main {
             System.out.println("================");
             System.out.println("Press Enter To Continue...");
         }else {
-            System.out.println("===============================================================");
-            System.out.printf("| %-10s | %-15s | %-15s | %-10s |\n","Ship ID","Shipping Name", "Shipping Method","Cost");
-            System.out.println("===============================================================");
+        	
+            System.out.println("============================================================================");
+            System.out.printf("| %-10s | %-15s | %-15s | %-10s | %-10s |\n","Ship ID","Shipping Name", "Shipping Method","Cost", "Cust ID");
+            System.out.println("============================================================================");
+            
             for(Land l : lands) {
-                System.out.printf("| %-10s | %-15s | %-15s | %-10s |\n",l.getShipID(),l.getShippingName(),l.getShippingMethodName(),l.getShippingCost());
+            	TransactionHistory tempTH = null;
+            	if(tempTH == null)
+            	{
+            		for (TransactionHistory TH : transHistory) {
+            			if(TH.getShipID().equals(l.getShipID()))
+            			{
+            				tempTH = TH;
+            				break;
+            			}
+            		}
+            	}
+                System.out.printf("| %-10s | %-15s | %-15s | %-10s | %-10s |\n",l.getShipID(),l.getShippingName(),l.getShippingMethodName(),l.getShippingCost(), tempTH.getCustID());
             }
             
             for(Sea s : seas) {
-                System.out.printf("| %-10s | %-15s | %-15s | %-10s |\n",s.getShipID(),s.getShippingName(),s.getShippingMethodName(),s.getShippingCost());
+            	TransactionHistory tempTH = null;
+            	if(tempTH == null)
+            	{
+            		for (TransactionHistory TH : transHistory) {
+            			if(TH.getShipID().equals(s.getShipID()))
+            			{
+            				tempTH = TH;
+            				break;
+            			}
+            		}
+            	}
+            	System.out.printf("| %-10s | %-15s | %-15s | %-10s | %-10s |\n",s.getShipID(),s.getShippingName(),s.getShippingMethodName(),s.getShippingCost(), tempTH.getCustID());
             }
-            
             for(Air a : airs) {
-                System.out.printf("| %-10s | %-15s | %-15s | %-10s |\n",a.getShipID(),a.getShippingName(),a.getShippingMethodName(),a.getShippingCost());
+            	TransactionHistory tempTH = null;
+            	if(tempTH == null)
+            	{
+            		for (TransactionHistory TH : transHistory) {
+            			if(TH.getShipID().equals(a.getShipID()))
+            			{
+            				tempTH = TH;
+            				break;
+            			}
+            		}
+            	}
+            	System.out.printf("| %-10s | %-15s | %-15s | %-10s | %-10s |\n",a.getShipID(),a.getShippingName(),a.getShippingMethodName(),a.getShippingCost(), tempTH.getCustID());
             }
-            System.out.println("===============================================================");
+            System.out.println("============================================================================");
             System.out.println("Press Enter To Continue...");
         }
         sc.nextLine();
