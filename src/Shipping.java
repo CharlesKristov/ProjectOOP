@@ -4,11 +4,18 @@ public class Shipping {
 	private String shipID;
 	private String shippingName;
 	private String shippingMethodName;
+	private int shippingCost = 0;
 	public Shipping(String shipID, String shippingName, String shippingMethodName) {
 		super();
 		this.shipID = shipID;
 		this.shippingName = shippingName;
 		this.shippingMethodName = shippingMethodName;
+	}
+	public int getShippingCost() {
+		return shippingCost;
+	}
+	public void setShippingCost(int shippingCost) {
+		this.shippingCost = shippingCost;
 	}
 	public String getShipID() {
 		return shipID;
